@@ -13,23 +13,58 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <EditText
-            android:id="@+id/edit_text"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
-            android:layout_weight="4"
             android:layout_height="wrap_content"
-            android:hint="Enter Item"/>
+            android:layout_weight="1"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:hint="Enter Task">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:hint="Enter Description">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/desc_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:hint="Enter Type">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/type_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/btn_add"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Add"/>
+            android:text="Add Item"/>
     </LinearLayout>
-
 
     <!-- To-Do List -->
     <ListView
@@ -40,5 +75,4 @@
         android:layout_marginTop="12dp"
         android:background="#FFFFFF"
         android:elevation="4dp" />
-
 </LinearLayout>

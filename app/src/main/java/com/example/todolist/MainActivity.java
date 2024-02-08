@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             item.ItemDescription = itemDesc;
             item.Type = itemType;
             item.CreatedDate = new java.util.Date(); // Set creation date
+            item.IconResourceId = R.drawable.time_clock; // Set the icon resource ID
             itemList.add(item);
         } else {
             Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             TextView typeTextView = convertView.findViewById(R.id.type_text);
             TextView createdDateTextView = convertView.findViewById(R.id.created_date);
             TextView expireTimeTextView = convertView.findViewById(R.id.expire_time);
+            ImageView iconImageView = convertView.findViewById(R.id.icon_image);
 
             // Check if itemList is not empty and position is within bounds
             if (!itemList.isEmpty() && position < itemList.size()) {
@@ -110,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
                 descriptionTextView.setText("Description: " + currentItem.ItemDescription);
                 typeTextView.setText("Type: " + currentItem.Type);
                 createdDateTextView.setText("Created: " + currentItem.CreatedDate.toString());
+
+                // Load and display the icon
+                iconImageView.setImageResource(currentItem.IconResourceId);
 
                 // Calculate expiration time
                 long expirationTimeMillis = currentItem.CreatedDate.getTime() + (2 * 60 * 60 * 1000); // 2 hours in milliseconds
@@ -131,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 typeTextView.setText("");
                 createdDateTextView.setText("");
                 expireTimeTextView.setText("");
+                iconImageView.setImageResource(R.drawable.time_clock); // Set a default icon if needed
             }
 
             Button editButton = convertView.findViewById(R.id.edit_button);
@@ -197,16 +204,16 @@ public class MainActivity extends AppCompatActivity {
         Set<String> serializedItems = new HashSet<>();
 
         for (Item item : itemList) {
-            // Serialize each item to a string (you can use Gson or another serialization method)
-            // For simplicity, here's a basic implementation:
+            // Serialize each item to a string
             String serializedItem = item.Todo + "|" + item.ItemDescription + "|" + item.Type + "|" +
-                    item.CreatedDate.toString();
+                    item.CreatedDate.toString() + "|" + item.IconResourceId;
             serializedItems.add(serializedItem);
         }
 
         editor.putStringSet("todo_items", serializedItems);
         editor.apply();
     }
+
 
     private void loadItemsFromSharedPreferences() {
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
@@ -217,12 +224,13 @@ public class MainActivity extends AppCompatActivity {
         // Deserialize each string back to an Item and add to the list
         for (String serializedItem : savedItems) {
             String[] parts = serializedItem.split("\\|");
-            if (parts.length == 4) {
+            if (parts.length == 5) { // Check for the correct number of parts
                 Item item = new Item();
                 item.Todo = parts[0];
                 item.ItemDescription = parts[1];
                 item.Type = parts[2];
                 item.CreatedDate = new java.util.Date(parts[3]);
+                item.IconResourceId = Integer.parseInt(parts[4]); // Parse the icon resource ID
                 itemList.add(item);
                 items.add(item.Todo); // Only add the Todo part to the displayed list if needed
             }

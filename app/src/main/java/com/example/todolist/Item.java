@@ -5,18 +5,22 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Item implements Serializable {
-    String Todo;
-    String ItemDescription;
-    String Type;
-    Date CreatedDate;
-    Date TodoTime;
-    int IconResourceId;
-    boolean isChecked; // Add a field for checkbox state
 
+    // Fields representing the properties of an item
+    String Todo;            // Task name
+    String ItemDescription; // Task description
+    String Type;            // Task type
+    Date CreatedDate;       // Task creation date
+    Date TodoTime;          // Task completion time
+    int IconResourceId;     // Resource ID for the task icon
+    boolean isChecked;      // Checkbox state for task completion
+
+    // Getter for the checkbox state
     public boolean isChecked() {
         return isChecked;
     }
 
+    // Setter for the checkbox state
     public void setChecked(boolean checked) {
         isChecked = checked;
     }

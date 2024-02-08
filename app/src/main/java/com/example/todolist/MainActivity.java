@@ -28,13 +28,13 @@ public class MainActivity extends AppCompatActivity {
     private Button button;
     private ListView list;
     private EditText name_Input;
-    private EditText desc_imput;
+    private EditText desc_input;
     private EditText type_input;
 
     private ArrayAdapter<String> itemAdapter;
 
     private List<Item> itemList = new ArrayList<>();
-    // Use a custom adapter to handle custom list item layout
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         onInit();
 
         items = new ArrayList<>();
-        itemAdapter = new CustomAdapter(); // Initialize custom adapter
+        itemAdapter = new CustomAdapter();
         list.setAdapter(itemAdapter);
         loadItemsFromSharedPreferences();
 
@@ -52,26 +52,26 @@ public class MainActivity extends AppCompatActivity {
                 addItem();
             }
         });
-
-
     }
 
-    private void onInit(){
+    private void onInit() {
         list = findViewById(R.id.lv_todo);
         button = findViewById(R.id.btn_add);
         name_Input = findViewById(R.id.edit_text);
-        desc_imput = findViewById(R.id.desc_txt);
+        desc_input = findViewById(R.id.desc_txt);
         type_input = findViewById(R.id.type_txt);
     }
 
     private void addItem() {
         String itemText = name_Input.getText().toString();
         if (!itemText.isEmpty()) {
-            items.add(itemText); // Add item to the list
-            itemAdapter.notifyDataSetChanged(); // Notify adapter that data has changed
-            name_Input.setText(""); // Clear input
+            items.add(itemText);
+            itemAdapter.notifyDataSetChanged();
+            name_Input.setText("");
+
             Item item = new Item();
             item.Todo = itemText;
+            item.CreatedDate = new java.util.Date(); // Set creation date
             itemList.add(item);
         } else {
             Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         saveItemsToSharedPreferences();
     }
 
-    // Custom adapter class to handle custom list item layout and functionality
     private class CustomAdapter extends ArrayAdapter<String> {
 
         public CustomAdapter() {
@@ -88,35 +87,38 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            // Inflating custom list item layout if convertView is null
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_layout, parent, false);
             }
 
-            // Setting text for to-do item
             TextView textView = convertView.findViewById(R.id.todo_text);
             textView.setText(items.get(position));
 
+            TextView createdDateTextView = convertView.findViewById(R.id.created_date);
 
-            // Setting click listener for edit button
+            // Check if itemList is not empty and position is within bounds
+            if (!itemList.isEmpty() && position < itemList.size()) {
+                createdDateTextView.setText("Created: " + itemList.get(position).CreatedDate.toString());
+            } else {
+                createdDateTextView.setText(""); // Set an empty string or handle accordingly
+            }
+
             Button editButton = convertView.findViewById(R.id.edit_button);
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Add your edit functionality here
                     showEditDialog(position);
-
-                    Toast.makeText(MainActivity.this, "Edit clicked for item at position " + position, Toast.LENGTH_SHORT).show();
                 }
             });
 
-            // Setting click listener for delete button
             Button deleteButton = convertView.findViewById(R.id.delete_button);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Remove item from the list and notify adapter
                     items.remove(position);
+                    if (!itemList.isEmpty() && position < itemList.size()) {
+                        itemList.remove(position);
+                    }
                     saveItemsToSharedPreferences();
                     notifyDataSetChanged();
                 }
@@ -124,31 +126,29 @@ public class MainActivity extends AppCompatActivity {
 
             return convertView;
         }
+
         private void showEditDialog(final int position) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this); // Use MainActivity.this as the context
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("Edit Item");
 
             final EditText input = new EditText(MainActivity.this);
             input.setText(items.get(position));
             builder.setView(input);
 
-            // Set positive button for saving changes
             builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // Retrieve edited text and update the list
                     String editedText = input.getText().toString();
                     if (!editedText.isEmpty()) {
                         items.set(position, editedText);
+                        itemList.get(position).Todo = editedText;
                         itemAdapter.notifyDataSetChanged();
                     } else {
-                        // Show a toast if the edited text is empty
                         Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
 
-            // Set negative button for canceling the edit
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -156,14 +156,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            // Show the edit dialog
             builder.show();
             saveItemsToSharedPreferences();
         }
-
     }
+
     private void saveItemsToSharedPreferences() {
-        // Use SharedPreferences to save the list of items
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet("todo_items", new HashSet<>(items));

@@ -96,18 +96,23 @@ public class MainActivity extends AppCompatActivity {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_layout, parent, false);
             }
 
-            TextView textView = convertView.findViewById(R.id.todo_text);
-            textView.setText(items.get(position));
-
+            TextView todoTextView = convertView.findViewById(R.id.todo_text);
+            TextView descriptionTextView = convertView.findViewById(R.id.description_text);
+            TextView typeTextView = convertView.findViewById(R.id.type_text);
             TextView createdDateTextView = convertView.findViewById(R.id.created_date);
             TextView expireTimeTextView = convertView.findViewById(R.id.expire_time);
 
             // Check if itemList is not empty and position is within bounds
             if (!itemList.isEmpty() && position < itemList.size()) {
-                createdDateTextView.setText("Created: " + itemList.get(position).CreatedDate.toString());
+                Item currentItem = itemList.get(position);
+
+                todoTextView.setText(currentItem.Todo);
+                descriptionTextView.setText("Description: " + currentItem.ItemDescription);
+                typeTextView.setText("Type: " + currentItem.Type);
+                createdDateTextView.setText("Created: " + currentItem.CreatedDate.toString());
 
                 // Calculate expiration time
-                long expirationTimeMillis = itemList.get(position).CreatedDate.getTime() + (2 * 60 * 60 * 1000); // 2 hours in milliseconds
+                long expirationTimeMillis = currentItem.CreatedDate.getTime() + (2 * 60 * 60 * 1000); // 2 hours in milliseconds
                 long currentTimeMillis = System.currentTimeMillis();
                 long timeRemainingMillis = expirationTimeMillis - currentTimeMillis;
 
@@ -116,12 +121,15 @@ public class MainActivity extends AppCompatActivity {
                     long minutesRemaining = (timeRemainingMillis / (1000 * 60)) % 60;
                     long hoursRemaining = (timeRemainingMillis / (1000 * 60 * 60)) % 24;
 
-                    expireTimeTextView.setText("Planlagt om: " + hoursRemaining + " Time " + minutesRemaining + " Minutter");
+                    expireTimeTextView.setText("Expires in: " + hoursRemaining + " hours " + minutesRemaining + " minutes");
                 } else {
                     expireTimeTextView.setText("Expired");
                 }
             } else {
-                createdDateTextView.setText(""); // Set an empty string or handle accordingly
+                todoTextView.setText(""); // Set an empty string or handle accordingly
+                descriptionTextView.setText("");
+                typeTextView.setText("");
+                createdDateTextView.setText("");
                 expireTimeTextView.setText("");
             }
 
@@ -148,39 +156,39 @@ public class MainActivity extends AppCompatActivity {
 
             return convertView;
         }
+    }
 
-        private void showEditDialog(final int position) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Edit Item");
+    private void showEditDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Edit Item");
 
-            final EditText input = new EditText(MainActivity.this);
-            input.setText(items.get(position));
-            builder.setView(input);
+        final EditText input = new EditText(MainActivity.this);
+        input.setText(items.get(position));
+        builder.setView(input);
 
-            builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String editedText = input.getText().toString();
-                    if (!editedText.isEmpty()) {
-                        items.set(position, editedText);
-                        itemList.get(position).Todo = editedText;
-                        itemAdapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
-                    }
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String editedText = input.getText().toString();
+                if (!editedText.isEmpty()) {
+                    items.set(position, editedText);
+                    itemList.get(position).Todo = editedText;
+                    itemAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
                 }
-            });
+            }
+        });
 
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
-            builder.show();
-            saveItemsToSharedPreferences();
-        }
+        builder.show();
+        saveItemsToSharedPreferences();
     }
 
     private void saveItemsToSharedPreferences() {

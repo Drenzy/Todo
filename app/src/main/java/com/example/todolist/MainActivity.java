@@ -3,9 +3,15 @@ package com.example.todolist;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> itemAdapter;
 
     private List<Item> itemList = new ArrayList<>();
+    private BroadcastReceiver screenReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +55,59 @@ public class MainActivity extends AppCompatActivity {
         list.setAdapter(itemAdapter);
         loadItemsFromSharedPreferences();
 
+        // Play the default notification sound when the app is opened
+        playDefaultNotificationSound();
+
+        // Register the BroadcastReceiver to listen for screen on/off events
+        registerScreenReceiver();
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addItem();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the BroadcastReceiver when the activity is destroyed
+        unregisterReceiver(screenReceiver);
+    }
+
+    private void registerScreenReceiver() {
+        screenReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                    // Screen is turned on, play the default notification sound
+                    playDefaultNotificationSound();
+                } else if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
+                    // Screen is turned off, play the default notification sound
+                    playDefaultNotificationSound();
+                }
+            }
+        };
+
+        // Register the BroadcastReceiver to listen for screen on/off events
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenReceiver, filter);
+    }
+
+    private void playDefaultNotificationSound() {
+        try {
+            // Get the default notification sound URI
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            // Create a Ringtone object and play the notification sound
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void onInit() {

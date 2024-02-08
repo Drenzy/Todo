@@ -53,12 +53,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         onInit();
 
+        // Create and show a notification when the app starts
         Notification notification = createNotification();
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
 
-        ToDoNotifications not = new ToDoNotifications(this);
+        ToDoNotifications toDoNotifications = new ToDoNotifications(this);
+        toDoNotifications.startThread(notification);
 
-        not.startThread(notification);
+        // Initialize the UI components
         items = new ArrayList<>();
         itemAdapter = new CustomAdapter();
         list.setAdapter(itemAdapter);
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         // Register the BroadcastReceiver to listen for screen on/off events
         registerScreenReceiver();
 
+        // Set the onClickListener for the "Add" button
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Create a notification with a default configuration
     Notification createNotification(){
         NotificationCompat.Builder builder = new NotificationCompat
                 .Builder(this, ToDoNotifications.CHANNEL_ID)
@@ -96,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(screenReceiver);
     }
 
+    // Register a BroadcastReceiver to listen for screen on/off events
     private void registerScreenReceiver() {
         screenReceiver = new BroadcastReceiver() {
             @Override
@@ -117,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(screenReceiver, filter);
     }
 
+    // Play the default notification sound
     private void playDefaultNotificationSound() {
         try {
             // Get the default notification sound URI
@@ -130,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Initialize UI components
     private void onInit() {
         list = findViewById(R.id.lv_todo);
         button = findViewById(R.id.btn_add);
@@ -138,16 +145,19 @@ public class MainActivity extends AppCompatActivity {
         type_input = findViewById(R.id.type_txt);
     }
 
+    // Add a new item to the list
     private void addItem() {
         String itemName = name_Input.getText().toString();
         String itemDesc = desc_input.getText().toString();
         String itemType = type_input.getText().toString();
 
         if (!itemName.isEmpty()) {
+            // Add item to the list and update the UI
             items.add(itemName);
             itemAdapter.notifyDataSetChanged();
             name_Input.setText("");
 
+            // Create an Item object and add it to the itemList
             Item item = new Item();
             item.Todo = itemName;
             item.ItemDescription = itemDesc;
@@ -158,9 +168,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
         }
+        // Save the updated list to SharedPreferences
         saveItemsToSharedPreferences();
     }
 
+    // CustomAdapter for displaying items in the ListView
     private class CustomAdapter extends ArrayAdapter<String> {
         public CustomAdapter() {
             super(MainActivity.this, R.layout.list_item_layout, items);
@@ -214,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
                 iconImageView.setImageResource(R.drawable.time_clock); // Set a default icon if needed
             }
 
+            // Set onClickListener for the "Edit" button
             Button editButton = convertView.findViewById(R.id.edit_button);
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -222,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            // Set onClickListener for the "Delete" button
             Button deleteButton = convertView.findViewById(R.id.delete_button);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -239,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Show a dialog for editing an item
     private void showEditDialog(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Edit Item");
@@ -252,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String editedText = input.getText().toString();
                 if (!editedText.isEmpty()) {
+                    // Update item in the list and UI
                     items.set(position, editedText);
                     itemList.get(position).Todo = editedText;
                     itemAdapter.notifyDataSetChanged();
@@ -269,9 +285,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         builder.show();
+        // Save the updated list to SharedPreferences
         saveItemsToSharedPreferences();
     }
 
+    // Save the items list to SharedPreferences
     private void saveItemsToSharedPreferences() {
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -288,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-
+    // Load items from SharedPreferences and update the UI
     private void loadItemsFromSharedPreferences() {
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         Set<String> savedItems = sharedPreferences.getStringSet("todo_items", new HashSet<>());
@@ -310,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Update the UI
         itemAdapter.notifyDataSetChanged();
     }
 }

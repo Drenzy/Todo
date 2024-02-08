@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                     long minutesRemaining = (timeRemainingMillis / (1000 * 60)) % 60;
                     long hoursRemaining = (timeRemainingMillis / (1000 * 60 * 60)) % 24;
 
-                    expireTimeTextView.setText("Expires in: " + hoursRemaining + " hours " + minutesRemaining + " minutes");
+                    expireTimeTextView.setText("Planlagt om: " + hoursRemaining + " hours " + minutesRemaining + " minutes");
                 } else {
                     expireTimeTextView.setText("Expired");
                 }

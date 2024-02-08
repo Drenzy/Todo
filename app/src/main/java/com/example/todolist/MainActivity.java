@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.todolist.Item;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -63,14 +64,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addItem() {
-        String itemText = name_Input.getText().toString();
-        if (!itemText.isEmpty()) {
-            items.add(itemText);
+        String itemName = name_Input.getText().toString();
+        String itemDesc = desc_input.getText().toString();
+        String itemType = type_input.getText().toString();
+
+        if (!itemName.isEmpty()) {
+            items.add(itemName);
             itemAdapter.notifyDataSetChanged();
             name_Input.setText("");
 
             Item item = new Item();
-            item.Todo = itemText;
+            item.Todo = itemName;
+            item.ItemDescription = itemDesc;
+            item.Type = itemType;
             item.CreatedDate = new java.util.Date(); // Set creation date
             itemList.add(item);
         } else {
@@ -80,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class CustomAdapter extends ArrayAdapter<String> {
-
         public CustomAdapter() {
             super(MainActivity.this, R.layout.list_item_layout, items);
         }
@@ -164,14 +169,40 @@ public class MainActivity extends AppCompatActivity {
     private void saveItemsToSharedPreferences() {
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putStringSet("todo_items", new HashSet<>(items));
+        Set<String> serializedItems = new HashSet<>();
+
+        for (Item item : itemList) {
+            // Serialize each item to a string (you can use Gson or another serialization method)
+            // For simplicity, here's a basic implementation:
+            String serializedItem = item.Todo + "|" + item.ItemDescription + "|" + item.Type + "|" +
+                    item.CreatedDate.toString();
+            serializedItems.add(serializedItem);
+        }
+
+        editor.putStringSet("todo_items", serializedItems);
         editor.apply();
     }
 
     private void loadItemsFromSharedPreferences() {
         SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
         Set<String> savedItems = sharedPreferences.getStringSet("todo_items", new HashSet<>());
-        items.addAll(savedItems);
+        items.clear();
+        itemList.clear();
+
+        // Deserialize each string back to an Item and add to the list
+        for (String serializedItem : savedItems) {
+            String[] parts = serializedItem.split("\\|");
+            if (parts.length == 4) {
+                Item item = new Item();
+                item.Todo = parts[0];
+                item.ItemDescription = parts[1];
+                item.Type = parts[2];
+                item.CreatedDate = new java.util.Date(parts[3]);
+                itemList.add(item);
+                items.add(item.Todo); // Only add the Todo part to the displayed list if needed
+            }
+        }
+
         itemAdapter.notifyDataSetChanged();
     }
 }

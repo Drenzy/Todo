@@ -18,6 +18,7 @@ public class Description extends AppCompatActivity {
         // Retrieve the selected Item object from the intent
         Item selectedItem = (Item) getIntent().getSerializableExtra("selectedItem");
 
+
         // Use the selected Item object's properties as needed
         todoTextView = findViewById(R.id.todoTextView);
         descTextView = findViewById(R.id.descTextView);

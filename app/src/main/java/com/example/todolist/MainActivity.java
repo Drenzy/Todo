@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    //private ArrayList<String> items;
+    private ArrayList<String> items;
     private Button button;
     private ListView list;
     private EditText name_Input;
     private EditText desc_imput;
     private EditText type_input;
 
-    private ArrayAdapter<Item> itemAdapter;
+    private ArrayAdapter<String> itemAdapter;
 
     private List<Item> itemList = new ArrayList<>();
     // Use a custom adapter to handle custom list item layout
@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         onInit();
 
-        itemList = new ArrayList<>();
-        itemAdapter = new CustomAdapter(this, itemList); // Initialize custom adapter
+        items = new ArrayList<>();
+        itemAdapter = new CustomAdapter(); // Initialize custom adapter
         list.setAdapter(itemAdapter);
         loadItemsFromSharedPreferences();
 
@@ -65,37 +65,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addItem() {
-        String nameText = name_Input.getText().toString();
-        String descText = desc_imput.getText().toString();
-        String typeText = type_input.getText().toString();
-
-        if (!nameText.isEmpty()) {
-            //item.Todo.add(nameText); // Add item to the list
+        String itemText = name_Input.getText().toString();
+        if (!itemText.isEmpty()) {
+            items.add(itemText); // Add item to the list
             itemAdapter.notifyDataSetChanged(); // Notify adapter that data has changed
-            name_Input.setText(""); // Clear task input
-            desc_imput.setText(""); // Clear description input
-            type_input.setText(""); // Clear type input
-
-
-            // Create a new Item object and set its properties
-            Item newItem = new Item();
-            newItem.Todo = nameText;
-            newItem.ItemDescription = descText;
-            newItem.Type = typeText;
-            itemList.add(newItem);
+            name_Input.setText(""); // Clear input
+            Item item = new Item();
+            item.Todo = itemText;
+            itemList.add(item);
         } else {
-            Toast.makeText(getApplicationContext(), "Please enter a task...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
         }
         saveItemsToSharedPreferences();
     }
 
     // Custom adapter class to handle custom list item layout and functionality
-    private class CustomAdapter extends ArrayAdapter<Item> {
+    private class CustomAdapter extends ArrayAdapter<String> {
 
-        public CustomAdapter(Context context, List<Item> items) {
+        public CustomAdapter() {
             super(MainActivity.this, R.layout.list_item_layout, items);
         }
-
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
@@ -106,14 +95,14 @@ public class MainActivity extends AppCompatActivity {
 
             // Setting text for to-do item
             TextView textView = convertView.findViewById(R.id.todo_text);
-            textView.setText(itemList.get(position).Todo);
+            textView.setText(items.get(position));
 
             // Setting click listener for list item
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // Start a new activity with the selected item data
-                    startNewItemActivity(itemList.get(position));
+                    startNewItemActivity(items.get(position));
                 }
             });
 
@@ -136,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     // Remove item from the list and notify adapter
-                    itemList.remove(position);
+                    items.remove(position);
                     saveItemsToSharedPreferences();
                     notifyDataSetChanged();
                 }
@@ -149,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setTitle("Edit Item");
 
             final EditText input = new EditText(MainActivity.this);
-            input.setText(itemList.get(position));
+            input.setText(items.get(position));
             builder.setView(input);
 
             // Set positive button for saving changes
@@ -197,13 +186,11 @@ public class MainActivity extends AppCompatActivity {
         itemAdapter.notifyDataSetChanged();
     }
 
-    private void startNewItemActivity(Item selectedItem) {
+    private void startNewItemActivity(String selectedItem) {
         // Create an Intent to start the new activity
         Intent intent = new Intent(MainActivity.this, Description.class);
         // Pass the selected item data to the new activity
         intent.putExtra("selectedItem", selectedItem);
-        // Pass the itemList to the new activity
-        intent.putExtra("itemList", new ArrayList<>(itemList));
         startActivity(intent);
     }
 }

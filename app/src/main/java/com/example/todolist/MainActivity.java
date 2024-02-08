@@ -1,10 +1,5 @@
 package com.example.todolist;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,7 +22,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.todolist.Item;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Retrieve user preference for dark mode or use the system default
+        int savedNightMode = getPreferences(Context.MODE_PRIVATE).getInt("night_mode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        AppCompatDelegate.setDefaultNightMode(savedNightMode);
         setContentView(R.layout.activity_main);
         onInit();
 
@@ -331,4 +333,19 @@ public class MainActivity extends AppCompatActivity {
         // Update the UI
         itemAdapter.notifyDataSetChanged();
     }
+
+    private void toggleDarkMode() {
+        int nightMode = AppCompatDelegate.getDefaultNightMode();
+        int newNightMode = (nightMode == AppCompatDelegate.MODE_NIGHT_YES) ?
+                AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
+
+        // Save the new night mode preference
+        getPreferences(Context.MODE_PRIVATE).edit().putInt("night_mode", newNightMode).apply();
+
+        // Set the new night mode
+        AppCompatDelegate.setDefaultNightMode(newNightMode);
+        recreate();
+    }
+
+
 }

@@ -1,0 +1,8 @@
+<!-- res/values-night/styles.xml -->
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <!-- Add more attributes as needed -->
+    </style>
+</resources>

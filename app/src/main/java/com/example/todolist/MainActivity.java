@@ -97,15 +97,6 @@ public class MainActivity extends AppCompatActivity {
             TextView textView = convertView.findViewById(R.id.todo_text);
             textView.setText(items.get(position));
 
-            // Setting click listener for list item
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Start a new activity with the selected item data
-                    startNewItemActivity(items.get(position));
-                }
-            });
-
 
             // Setting click listener for edit button
             Button editButton = convertView.findViewById(R.id.edit_button);
@@ -184,13 +175,5 @@ public class MainActivity extends AppCompatActivity {
         Set<String> savedItems = sharedPreferences.getStringSet("todo_items", new HashSet<>());
         items.addAll(savedItems);
         itemAdapter.notifyDataSetChanged();
-    }
-
-    private void startNewItemActivity(String selectedItem) {
-        // Create an Intent to start the new activity
-        Intent intent = new Intent(MainActivity.this, Description.class);
-        // Pass the selected item data to the new activity
-        intent.putExtra("selectedItem", selectedItem);
-        startActivity(intent);
     }
 }

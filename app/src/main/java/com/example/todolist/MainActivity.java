@@ -100,12 +100,29 @@ public class MainActivity extends AppCompatActivity {
             textView.setText(items.get(position));
 
             TextView createdDateTextView = convertView.findViewById(R.id.created_date);
+            TextView expireTimeTextView = convertView.findViewById(R.id.expire_time);
 
             // Check if itemList is not empty and position is within bounds
             if (!itemList.isEmpty() && position < itemList.size()) {
                 createdDateTextView.setText("Created: " + itemList.get(position).CreatedDate.toString());
+
+                // Calculate expiration time
+                long expirationTimeMillis = itemList.get(position).CreatedDate.getTime() + (2 * 60 * 60 * 1000); // 2 hours in milliseconds
+                long currentTimeMillis = System.currentTimeMillis();
+                long timeRemainingMillis = expirationTimeMillis - currentTimeMillis;
+
+                // Check if the item is still valid
+                if (timeRemainingMillis > 0) {
+                    long minutesRemaining = (timeRemainingMillis / (1000 * 60)) % 60;
+                    long hoursRemaining = (timeRemainingMillis / (1000 * 60 * 60)) % 24;
+
+                    expireTimeTextView.setText("Expires in: " + hoursRemaining + " hours " + minutesRemaining + " minutes");
+                } else {
+                    expireTimeTextView.setText("Expired");
+                }
             } else {
                 createdDateTextView.setText(""); // Set an empty string or handle accordingly
+                expireTimeTextView.setText("");
             }
 
             Button editButton = convertView.findViewById(R.id.edit_button);

@@ -2,7 +2,10 @@ package com.example.todolist;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         onInit();
 
+        Notification notification = createNotification();
+        NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+
+        ToDoNotifications not = new ToDoNotifications(this);
+
+        not.startThread(notification);
         items = new ArrayList<>();
         itemAdapter = new CustomAdapter();
         list.setAdapter(itemAdapter);
@@ -67,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
                 addItem();
             }
         });
+    }
+
+    Notification createNotification(){
+        NotificationCompat.Builder builder = new NotificationCompat
+                .Builder(this, ToDoNotifications.CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icn)
+                .setContentTitle("Danios's App")
+                .setContentText("Du har nodi min bror ")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        return builder.build();
+
     }
 
     @Override

@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         int savedNightMode = getPreferences(Context.MODE_PRIVATE).getInt("night_mode",
                 AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         AppCompatDelegate.setDefaultNightMode(savedNightMode);
+
         setContentView(R.layout.activity_main);
         onInit();
 

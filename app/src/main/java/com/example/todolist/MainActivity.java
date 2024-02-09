@@ -50,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Retrieve user preference for dark mode or use the system default
-        int savedNightMode = getPreferences(Context.MODE_PRIVATE).getInt("night_mode", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        int savedNightMode = getPreferences(Context.MODE_PRIVATE).getInt("night_mode",
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         AppCompatDelegate.setDefaultNightMode(savedNightMode);
         setContentView(R.layout.activity_main);
         onInit();
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Create a notification with a default configuration
-    Notification createNotification(){
+    Notification createNotification() {
         NotificationCompat.Builder builder = new NotificationCompat
                 .Builder(this, ToDoNotifications.CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icn)
@@ -183,7 +184,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_layout, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_layout,
+                        parent, false);
             }
 
             TextView todoTextView = convertView.findViewById(R.id.todo_text);
@@ -206,7 +208,8 @@ public class MainActivity extends AppCompatActivity {
                 iconImageView.setImageResource(currentItem.IconResourceId);
 
                 // Calculate expiration time
-                long expirationTimeMillis = currentItem.CreatedDate.getTime() + (2 * 60 * 60 * 1000); // 2 hours in milliseconds
+                long expirationTimeMillis = currentItem.CreatedDate
+                        .getTime() + (2 * 60 * 60 * 1000); // 2 hours in milliseconds
                 long currentTimeMillis = System.currentTimeMillis();
                 long timeRemainingMillis = expirationTimeMillis - currentTimeMillis;
 
@@ -215,9 +218,10 @@ public class MainActivity extends AppCompatActivity {
                     long minutesRemaining = (timeRemainingMillis / (1000 * 60)) % 60;
                     long hoursRemaining = (timeRemainingMillis / (1000 * 60 * 60)) % 24;
 
-                    expireTimeTextView.setText("Planlagt om: " + hoursRemaining + " hours " + minutesRemaining + " minutes");
+                    expireTimeTextView.setText("Planlagt om: " + hoursRemaining + " hours "
+                            + minutesRemaining + " minutes");
                 } else {
-                    expireTimeTextView.setText("Expired");
+                    expireTimeTextView.setText("Udgået: ");
                 }
             } else {
                 todoTextView.setText(""); // Set an empty string or handle accordingly
@@ -274,7 +278,8 @@ public class MainActivity extends AppCompatActivity {
                     itemList.get(position).Todo = editedText;
                     itemAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Please enter text...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Please enter text...",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -346,6 +351,4 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(newNightMode);
         recreate();
     }
-
-
 }

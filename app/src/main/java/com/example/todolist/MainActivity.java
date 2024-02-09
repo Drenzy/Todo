@@ -40,9 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText name_Input;
     private EditText desc_input;
     private EditText type_input;
-
     private ArrayAdapter<String> itemAdapter;
-
     private List<Item> itemList = new ArrayList<>();
     private BroadcastReceiver screenReceiver;
 
